@@ -1,0 +1,44 @@
+---
+- hosts: apache
+  become: true
+
+  vars:
+    http_port: 80
+    domain: ec2-34-222-134-254.us-west-2.compute.amazonaws.com
+
+  tasks:
+    - name: install packages
+      apt:
+        name:
+          - apache2
+          - git
+        state: present
+        autoclean: yes
+
+    - name: enabled mod_rewrite
+      apache2_module: name=rewrite state=present
+      notify:
+        - restart apache2
+
+    - name: apache2 listen on port {{ http_port }}
+      lineinfile: dest=/etc/apache2/ports.conf regexp="^Listen " line="Listen {{ http_port }}" state=present
+      notify:
+        - restart apache2
+
+    - name: apache2 virtualhost on port {{ http_port }}
+      lineinfile: dest=/etc/apache2/sites-available/000-default.conf regexp="^<VirtualHost \*:" line="<VirtualHost *:{{ http_port }}>"
+      notify:
+        - restart apache2
+
+    - name: Clear git folder path
+      file:
+        state: absent
+        path: "/var/www/html"
+
+    - name: clone basic html template
+      git: repo=https://github.com/do-community/ansible-apache-tutorial.git dest=/var/www/html update=yes
+
+  handlers:
+    - name: restart apache2
+      service: name=apache2 state=restarted
+...

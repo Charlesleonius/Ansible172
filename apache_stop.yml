@@ -1,0 +1,11 @@
+---
+- hosts: apache
+  remote_user: ubuntu
+
+  tasks:
+  - name: Stop apache
+    become: true
+    service:
+      name: apache2
+      state: stopped
+...
