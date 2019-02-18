@@ -36,7 +36,7 @@
         path: "/var/www/html"
 
     - name: clone basic html template
-      git: repo=https://github.com/do-community/ansible-apache-tutorial.git dest=/var/www/html update=yes
+      git: repo=https://github.com/Charlesleonius/Ansible172.git dest=/var/www/html update=yes
 
   handlers:
     - name: restart apache2
